@@ -1,0 +1,10 @@
+[default_config]
+assembler = "gas"
+instruction_set = "x86"
+
+[opts]
+compiler = "gcc"
+
+[default_config.opts]
+diagnostics = false
+default_diagnostics = false
