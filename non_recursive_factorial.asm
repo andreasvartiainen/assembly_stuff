@@ -28,6 +28,7 @@ factorial:
   xor %ecx, %ecx
   incl %ebx       # make ebx 1
   incl %ecx
+
 loop_start:
   cmpl %eax, %ebx # if ebx is greater than eax jump to end
   jg end_loop
@@ -39,6 +40,7 @@ loop_start:
 
 end_loop:
   movl %ecx, %eax
+
 end:
   movl %ebp, %esp
   popl %ebp
