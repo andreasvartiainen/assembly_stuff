@@ -39,6 +39,7 @@ max:
   xor %eax, %eax      # empty eax
   movl -4(%ebp), %ebx # put array address here
   leal -8(%ebp), %ecx # put array length here
+
 loop_start:
   cmpl $0, (%ecx)     # check if it is zero
   je loop_end         # jump if it is to the loop_end
@@ -54,7 +55,6 @@ next:
   jmp loop_start      # go back to start of the loop
 
 loop_end:
-
   movl %ebp, %esp # reset esp and pop the old esb
   popl %ebp
   ret
