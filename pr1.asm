@@ -14,7 +14,7 @@
 .globl _start
 
 .section .data
-  values: .long 1, 2, 3, 1, 100, 0
+  values: .long 50, 200, 15, 3, 7, 100, 15, 20, 255
 
   string: .ascii "this is my first at&t assembly program!\n"
   string_len = . - string
@@ -34,15 +34,18 @@ _start:
   movl values(,%edi,4), %eax
   movl %eax, %ebx
 
-  loop:
-  cmpl $0, %eax
-  je end
-  incl %edi
-  movl values(,%edi,4), %eax
-  cmpl %ebx, %eax
-  jle loop
+  movl $8, %r8d
+  leal values(,%r8d,4), %r8d
 
-  movl %eax, %ebx
+loop:
+  incl %edi
+  lea values(,%edi,4), %eax # move current value address to eax
+  cmpl %r8d, %eax # compare the address with the last (r8d)
+  je end
+  cmpl %ebx, (%eax) # if eax is smaller than ebx go to loop
+  jge loop 
+  # otherwise assign 
+  movl (%eax), %ebx  # ebx = eax
 
   jmp loop
 
