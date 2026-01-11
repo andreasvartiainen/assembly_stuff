@@ -39,7 +39,7 @@
   .equ NUMBER_OF_ARGUMENTS, 2
 
 .section .bss
-  .equ BUFFER_SIZE, 500
+  .equ BUFFER_SIZE, 255
   .lcomm BUFFER_DATA, BUFFER_SIZE # reserves BUFFER_SIZE bytes
 
 .section .text
@@ -83,13 +83,14 @@ store_fd_out:
 ## BEGIN MAIN LOOP ##
 read_loop_begin:
   movl $SYS_READ, %eax
-  movl ST_FD_IN(%ebp), %ebx
+  movl $STDIN, %ebx
   movl $BUFFER_DATA, %ecx
   movl $BUFFER_SIZE, %edx
   int $LINUX_SYSCALL
 
   ## EXIT IF WE HAVE REACHED THE END ##
   cmpl $EOF, %eax # read syscall returns 0 if end of file is found
+  #cmpl $'0', %ecx
   jle end_loop
 
 continue_read_loop:
@@ -102,7 +103,7 @@ continue_read_loop:
   ## write ##
   movl %eax, %edx
   movl $SYS_WRITE, %eax
-  movl ST_FD_OUT(%ebp), %ebx
+  movl $STDOUT, %ebx
   movl $BUFFER_DATA, %ecx
   int $LINUX_SYSCALL
 
@@ -111,11 +112,11 @@ continue_read_loop:
 end_loop:
   ## close the files ##
   movl $SYS_CLOSE, %eax
-  movl ST_FD_OUT(%ebp), %ebx
+  movl $STDOUT, %ebx
   int $LINUX_SYSCALL
 
   movl $SYS_CLOSE, %eax
-  movl ST_FD_IN(%ebp), %ebx
+  movl $STDIN, %ebx
   int $LINUX_SYSCALL
 
   movl $SYS_EXIT, %eax

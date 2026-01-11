@@ -40,7 +40,10 @@
 
 .section .bss
   .equ BUFFER_SIZE, 500
+  .equ DESCRIPTOR_SIZE, 4
   .lcomm BUFFER_DATA, BUFFER_SIZE # reserves BUFFER_SIZE bytes
+  .lcomm FILE_READ, DESCRIPTOR_SIZE
+  .lcomm FILE_WRITE, DESCRIPTOR_SIZE
 
 .section .text
 
@@ -57,7 +60,7 @@
 _start:
   movl %esp, %ebp
 
-  subl $ST_SIZE_RESERVE, %esp # allocate space in stack all 8 in one go
+  #subl $ST_SIZE_RESERVE, %esp # allocate space in stack all 8 in one go
 
 open_files:
 open_fd_in:
@@ -68,7 +71,8 @@ open_fd_in:
   int $LINUX_SYSCALL
 
 store_fd_in:
-  movl %eax, ST_FD_IN(%ebp) # move file number in allocated space
+  #movl %eax, ST_FD_IN(%ebp) # move file number in allocated space
+  movl %eax, FILE_READ # move file number in allocated space
 
 open_fd_out:
   movl $SYS_OPEN, %eax
@@ -78,12 +82,14 @@ open_fd_out:
   int $LINUX_SYSCALL
 
 store_fd_out:
-  movl %eax, ST_FD_OUT(%ebp)
+  #movl %eax, ST_FD_OUT(%ebp)
+  movl %eax, FILE_WRITE 
 
 ## BEGIN MAIN LOOP ##
 read_loop_begin:
   movl $SYS_READ, %eax
-  movl ST_FD_IN(%ebp), %ebx
+  #movl ST_FD_IN(%ebp), %ebx
+  movl FILE_READ, %ebx
   movl $BUFFER_DATA, %ecx
   movl $BUFFER_SIZE, %edx
   int $LINUX_SYSCALL
@@ -102,7 +108,8 @@ continue_read_loop:
   ## write ##
   movl %eax, %edx
   movl $SYS_WRITE, %eax
-  movl ST_FD_OUT(%ebp), %ebx
+  #movl ST_FD_OUT(%ebp), %ebx
+  movl FILE_WRITE, %ebx
   movl $BUFFER_DATA, %ecx
   int $LINUX_SYSCALL
 
@@ -111,11 +118,11 @@ continue_read_loop:
 end_loop:
   ## close the files ##
   movl $SYS_CLOSE, %eax
-  movl ST_FD_OUT(%ebp), %ebx
+  movl FILE_WRITE, %ebx
   int $LINUX_SYSCALL
 
   movl $SYS_CLOSE, %eax
-  movl ST_FD_IN(%ebp), %ebx
+  movl FILE_READ, %ebx
   int $LINUX_SYSCALL
 
   movl $SYS_EXIT, %eax
